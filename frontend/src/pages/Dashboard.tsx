@@ -25,7 +25,7 @@ interface DashboardData {
     cancelledOrders: number;
     rejectedOrders: number;
     totalAccounts: number;
-    latestPriceSymbol: string;
+    latestPriceProduct: string;
     latestTestPassRate: number;
     averageApiResponseTime: number;
     latestTestRunStatus: string;
@@ -94,7 +94,7 @@ export default function Dashboard() {
               <MetricCard title="Accounts" value={metrics.totalAccounts} icon={<DatabaseOutlined />} tone="gray" />
             </Col>
             <Col xs={24} sm={12} xl={6}>
-              <MetricCard title="Latest price symbol" value={metrics.latestPriceSymbol} icon={<CloudServerOutlined />} tone="blue" />
+              <MetricCard title="Latest price product" value={metrics.latestPriceProduct} icon={<CloudServerOutlined />} tone="blue" />
             </Col>
             <Col xs={24} sm={12} xl={6}>
               <MetricCard title="Latest pass rate" value={`${metrics.latestTestPassRate}%`} icon={<FileDoneOutlined />} tone="teal" />
@@ -157,4 +157,3 @@ export default function Dashboard() {
     </div>
   );
 }
-

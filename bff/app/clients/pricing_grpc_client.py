@@ -24,7 +24,7 @@ def _target() -> str:
 
 def _to_dict(response: pricing_pb2.PriceResponse) -> dict:
     return {
-        "symbol": response.symbol,
+        "product": response.product,
         "bid": response.bid,
         "ask": response.ask,
         "mid": response.mid,
@@ -44,31 +44,30 @@ def _service_error(exc: grpc.RpcError) -> ServiceError:
     )
 
 
-def _get_price_sync(symbol: str) -> dict:
+def _get_price_sync(product: str) -> dict:
     with grpc.insecure_channel(_target()) as channel:
         stub = pricing_pb2_grpc.PricingServiceStub(channel)
         try:
-            response = stub.GetPrice(pricing_pb2.PriceRequest(symbol=symbol), timeout=10)
+            response = stub.GetPrice(pricing_pb2.PriceRequest(product=product), timeout=10)
         except grpc.RpcError as exc:
             raise _service_error(exc) from exc
     return _to_dict(response)
 
 
-def _stream_prices_sync(symbol: str) -> list[dict]:
+def _stream_prices_sync(product: str) -> list[dict]:
     with grpc.insecure_channel(_target()) as channel:
         stub = pricing_pb2_grpc.PricingServiceStub(channel)
         try:
-            responses = list(stub.StreamPrices(pricing_pb2.PriceRequest(symbol=symbol), timeout=10))
+            responses = list(stub.StreamPrices(pricing_pb2.PriceRequest(product=product), timeout=10))
         except grpc.RpcError as exc:
             raise _service_error(exc) from exc
     return [_to_dict(response) for response in responses]
 
 
-async def get_price(symbol: str) -> dict:
-    return await asyncio.to_thread(_get_price_sync, symbol)
+async def get_price(product: str) -> dict:
+    return await asyncio.to_thread(_get_price_sync, product)
 
 
-async def stream_price_demo(symbol: str) -> dict:
-    updates = await asyncio.to_thread(_stream_prices_sync, symbol)
-    return {"symbol": symbol.upper(), "updates": updates}
-
+async def stream_price_demo(product: str) -> dict:
+    updates = await asyncio.to_thread(_stream_prices_sync, product)
+    return {"product": product.upper(), "updates": updates}

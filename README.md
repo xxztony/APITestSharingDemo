@@ -75,8 +75,8 @@ POST   /api/orders
 PATCH  /api/orders/{order_id}/cancel
 GET    /api/portfolio/{account_id}
 POST   /api/portfolio/{account_id}/risk-limit
-GET    /api/pricing/{symbol}
-GET    /api/pricing/{symbol}/stream-demo
+GET    /api/pricing/{product}
+GET    /api/pricing/{product}/stream-demo
 POST   /api/test-runs
 GET    /api/test-runs
 GET    /api/test-runs/{run_id}
@@ -110,7 +110,7 @@ Create a valid order through the BFF:
 curl -X POST http://localhost:8000/api/orders \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer demo-token" \
-  -d "{\"accountId\":\"ACC001\",\"symbol\":\"LME-CA\",\"side\":\"BUY\",\"quantity\":10,\"price\":9125.5}"
+  -d "{\"accountId\":\"ACC001\",\"product\":\"LME-CA\",\"side\":\"BUY\",\"quantity\":10,\"price\":9125.5}"
 ```
 
 Create a rejected business order:
@@ -118,7 +118,7 @@ Create a rejected business order:
 ```bash
 curl -X POST http://localhost:8000/api/orders \
   -H "Content-Type: application/json" \
-  -d "{\"accountId\":\"ACC001\",\"symbol\":\"LME-ZN\",\"side\":\"BUY\",\"quantity\":15001,\"price\":2741.8}"
+  -d "{\"accountId\":\"ACC001\",\"product\":\"LME-ZN\",\"side\":\"BUY\",\"quantity\":15001,\"price\":2741.8}"
 ```
 
 Query portfolio directly against GraphQL for service-level testing:
@@ -132,7 +132,7 @@ query Portfolio($accountId: String!) {
     usedLimit
     availableLimit
     positions {
-      symbol
+      product
       quantity
       averagePrice
       marketValue
@@ -146,13 +146,13 @@ Run the query:
 ```bash
 curl -X POST http://localhost:8002/graphql \
   -H "Content-Type: application/json" \
-  -d "{\"query\":\"query Portfolio($accountId: String!) { portfolio(accountId: $accountId) { accountId cashBalance riskLimit usedLimit availableLimit positions { symbol quantity averagePrice marketValue } } }\",\"variables\":{\"accountId\":\"ACC001\"}}"
+  -d "{\"query\":\"query Portfolio($accountId: String!) { portfolio(accountId: $accountId) { accountId cashBalance riskLimit usedLimit availableLimit positions { product quantity averagePrice marketValue } } }\",\"variables\":{\"accountId\":\"ACC001\"}}"
 ```
 
 Call gRPC with grpcurl:
 
 ```bash
-grpcurl -plaintext -d "{\"symbol\":\"LME-CA\"}" localhost:50051 pricing.PricingService/GetPrice
+grpcurl -plaintext -d "{\"product\":\"LME-CA\"}" localhost:50051 pricing.PricingService/GetPrice
 ```
 
 Run regression through the BFF:
@@ -167,7 +167,7 @@ The test runner service executes pytest cases that call real services:
 
 - REST order tests: valid create, validation failure, business rejection, get order, cancel order, not found.
 - GraphQL portfolio tests: query portfolio, positions, risk limit mutation, negative risk limit error, missing account error.
-- gRPC pricing tests: unary price, bid/ask invariant, mid calculation, invalid symbol, five streaming updates.
+- gRPC pricing tests: unary price, bid/ask invariant, mid calculation, invalid product, five streaming updates.
 
 Results are written to MongoDB:
 
@@ -222,4 +222,3 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000
 - Internal service URLs are configured through Docker Compose environment variables.
 - gRPC reflection is enabled in pricing-service for easier demos with grpcurl.
 - Authentication is intentionally omitted; the frontend sends a mock `Authorization: Bearer demo-token` header.
-

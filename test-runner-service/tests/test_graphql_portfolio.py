@@ -9,7 +9,7 @@ query Portfolio($accountId: String!) {
     usedLimit
     availableLimit
     positions {
-      symbol
+      product
       quantity
       averagePrice
       marketValue
@@ -118,4 +118,3 @@ def test_query_non_existing_account_should_return_graphql_error(record_case):
     )
     assert call["response_status"] == 200
     assert "errors" in body
-

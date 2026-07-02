@@ -8,7 +8,7 @@ import MetricCard from "../components/MetricCard";
 const { Text, Title } = Typography;
 
 interface Price {
-  symbol: string;
+  product: string;
   bid: number;
   ask: number;
   mid: number;
@@ -17,12 +17,12 @@ interface Price {
 }
 
 interface StreamResponse {
-  symbol: string;
+  product: string;
   updates: Price[];
 }
 
 export default function Pricing() {
-  const [symbol, setSymbol] = useState("LME-CA");
+  const [product, setProduct] = useState("LME-CA");
   const [price, setPrice] = useState<Price | null>(null);
   const [stream, setStream] = useState<StreamResponse | null>(null);
   const [lastCall, setLastCall] = useState<ApiCallResult<unknown> | null>(null);
@@ -31,10 +31,10 @@ export default function Pricing() {
 
   async function getLatestPrice() {
     setLoading(true);
-    const result = await apiGet<Price>(`/api/pricing/${symbol}`);
+    const result = await apiGet<Price>(`/api/pricing/${product}`);
     setLoading(false);
     setLastCall(result);
-    setLastPayload({ method: "GET", path: `/api/pricing/${symbol}`, internalProtocol: "gRPC unary" });
+    setLastPayload({ method: "GET", path: `/api/pricing/${product}`, internalProtocol: "gRPC unary" });
     if (result.ok && result.data) {
       setPrice(result.data);
     }
@@ -42,10 +42,10 @@ export default function Pricing() {
 
   async function runStreamDemo() {
     setLoading(true);
-    const result = await apiGet<StreamResponse>(`/api/pricing/${symbol}/stream-demo`);
+    const result = await apiGet<StreamResponse>(`/api/pricing/${product}/stream-demo`);
     setLoading(false);
     setLastCall(result);
-    setLastPayload({ method: "GET", path: `/api/pricing/${symbol}/stream-demo`, internalProtocol: "gRPC server streaming" });
+    setLastPayload({ method: "GET", path: `/api/pricing/${product}/stream-demo`, internalProtocol: "gRPC server streaming" });
     if (result.ok && result.data) {
       setStream(result.data);
     }
@@ -63,9 +63,9 @@ export default function Pricing() {
       <Card className="panel-card">
         <Space wrap>
           <Select
-            value={symbol}
-            onChange={setSymbol}
-            options={["LME-CA", "LME-AL", "LME-ZN", "LME-NI", "BAD-SYMBOL"].map((value) => ({ value, label: value }))}
+            value={product}
+            onChange={setProduct}
+            options={["LME-CA", "LME-AL", "LME-ZN", "LME-NI", "BAD-PRODUCT"].map((value) => ({ value, label: value }))}
             className="control-wide"
           />
           <Button type="primary" icon={<ThunderboltOutlined />} onClick={() => void getLatestPrice()} loading={loading}>
@@ -91,11 +91,11 @@ export default function Pricing() {
       {stream ? (
         <Table
           rowKey="timestamp"
-          title={() => `Stream updates for ${stream.symbol}`}
+          title={() => `Stream updates for ${stream.product}`}
           dataSource={stream.updates}
           size="small"
           columns={[
-            { title: "Symbol", dataIndex: "symbol" },
+            { title: "Product", dataIndex: "product" },
             { title: "Bid", dataIndex: "bid" },
             { title: "Ask", dataIndex: "ask" },
             { title: "Mid", dataIndex: "mid" },
@@ -111,4 +111,3 @@ export default function Pricing() {
     </div>
   );
 }
-

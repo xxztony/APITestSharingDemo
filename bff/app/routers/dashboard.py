@@ -18,7 +18,7 @@ async def dashboard() -> dict:
     )
 
     orders = orders_result if isinstance(orders_result, list) else []
-    latest_price = price_result if isinstance(price_result, dict) else {"symbol": "LME-CA"}
+    latest_price = price_result if isinstance(price_result, dict) else {"product": "LME-CA"}
     test_runs = runs_result if isinstance(runs_result, list) else []
     latest_run = test_runs[0] if test_runs else None
 
@@ -28,7 +28,7 @@ async def dashboard() -> dict:
         "cancelledOrders": sum(1 for order in orders if order.get("status") == "CANCELLED"),
         "rejectedOrders": sum(1 for order in orders if order.get("status") == "REJECTED"),
         "totalAccounts": 3,
-        "latestPriceSymbol": latest_price.get("symbol", "LME-CA"),
+        "latestPriceProduct": latest_price.get("product", "LME-CA"),
         "latestTestPassRate": latest_run.get("pass_rate", 0) if latest_run else 0,
         "averageApiResponseTime": latest_run.get("average_duration_ms", 0) if latest_run else 0,
         "latestTestRunStatus": latest_run.get("status", "NO_RUN") if latest_run else "NO_RUN",
@@ -46,4 +46,3 @@ async def dashboard() -> dict:
             },
         }
     )
-

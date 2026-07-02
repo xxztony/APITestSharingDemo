@@ -23,7 +23,7 @@ def _target() -> str:
 
 def _to_dict(response: pricing_pb2.PriceResponse) -> dict:
     return {
-        "symbol": response.symbol,
+        "product": response.product,
         "bid": response.bid,
         "ask": response.ask,
         "mid": response.mid,
@@ -32,13 +32,13 @@ def _to_dict(response: pricing_pb2.PriceResponse) -> dict:
     }
 
 
-def get_price_call(symbol: str) -> dict[str, Any]:
+def get_price_call(product: str) -> dict[str, Any]:
     started = time.perf_counter()
-    request_payload = {"symbol": symbol}
+    request_payload = {"product": product}
     with grpc.insecure_channel(_target()) as channel:
         stub = pricing_pb2_grpc.PricingServiceStub(channel)
         try:
-            response = stub.GetPrice(pricing_pb2.PriceRequest(symbol=symbol), timeout=10)
+            response = stub.GetPrice(pricing_pb2.PriceRequest(product=product), timeout=10)
             response_payload: Any = _to_dict(response)
             response_status: str = "OK"
             error_message = ""
@@ -56,13 +56,13 @@ def get_price_call(symbol: str) -> dict[str, Any]:
     }
 
 
-def stream_prices_call(symbol: str) -> dict[str, Any]:
+def stream_prices_call(product: str) -> dict[str, Any]:
     started = time.perf_counter()
-    request_payload = {"symbol": symbol}
+    request_payload = {"product": product}
     with grpc.insecure_channel(_target()) as channel:
         stub = pricing_pb2_grpc.PricingServiceStub(channel)
         try:
-            responses = [_to_dict(response) for response in stub.StreamPrices(pricing_pb2.PriceRequest(symbol=symbol), timeout=10)]
+            responses = [_to_dict(response) for response in stub.StreamPrices(pricing_pb2.PriceRequest(product=product), timeout=10)]
             response_status: str = "OK"
             response_payload: Any = responses
             error_message = ""
@@ -78,4 +78,3 @@ def stream_prices_call(symbol: str) -> dict[str, Any]:
         "duration_ms": duration_ms,
         "error_message": error_message,
     }
-

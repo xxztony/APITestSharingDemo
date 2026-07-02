@@ -8,15 +8,14 @@ service PricingService {
 }
 
 message PriceRequest {
-  string symbol = 1;
+  string product = 1;
 }
 
 message PriceResponse {
-  string symbol = 1;
+  string product = 1;
   double bid = 2;
   double ask = 3;
   double mid = 4;
   string timestamp = 5;
   string source = 6;
 }
-

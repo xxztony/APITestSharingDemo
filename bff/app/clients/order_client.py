@@ -52,8 +52,8 @@ async def _request(method: str, path: str, **kwargs) -> Any:
     return payload
 
 
-async def list_orders(account_id: str | None = None, status: str | None = None, symbol: str | None = None) -> list[dict]:
-    params = {"account_id": account_id, "status": status, "symbol": symbol}
+async def list_orders(account_id: str | None = None, status: str | None = None, product: str | None = None) -> list[dict]:
+    params = {"account_id": account_id, "status": status, "product": product}
     clean_params = {key: value for key, value in params.items() if value}
     return await _request("GET", "/orders", params=clean_params)
 
@@ -68,4 +68,3 @@ async def create_order(payload: dict) -> dict:
 
 async def cancel_order(order_id: str) -> dict:
     return await _request("PATCH", f"/orders/{order_id}/cancel")
-

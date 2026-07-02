@@ -1,12 +1,12 @@
 from app.clients.pricing_grpc_client import get_price_call, stream_prices_call
 
 
-def test_get_price_with_valid_symbol_should_return_bid_ask_mid(record_case):
+def test_get_price_with_valid_product_should_return_bid_ask_mid(record_case):
     call = get_price_call("LME-CA")
     body = call["response_payload"]
     record_case(
         case_id="GRPC-001",
-        name="GetPrice with valid symbol should return bid, ask, mid",
+        name="GetPrice with valid product should return bid, ask, mid",
         protocol="gRPC",
         service="pricing-service",
         endpoint="PricingService/GetPrice",
@@ -16,7 +16,7 @@ def test_get_price_with_valid_symbol_should_return_bid_ask_mid(record_case):
         **call,
     )
     assert call["response_status"] == "OK"
-    assert body["symbol"] == "LME-CA"
+    assert body["product"] == "LME-CA"
     assert {"bid", "ask", "mid"}.issubset(body.keys())
 
 
@@ -57,11 +57,11 @@ def test_get_price_should_ensure_mid_is_average(record_case):
     assert body["mid"] == expected_mid
 
 
-def test_get_price_with_invalid_symbol_should_return_not_found(record_case):
-    call = get_price_call("BAD-SYMBOL")
+def test_get_price_with_invalid_product_should_return_not_found(record_case):
+    call = get_price_call("BAD-PRODUCT")
     record_case(
         case_id="GRPC-004",
-        name="GetPrice with invalid symbol should return NOT_FOUND",
+        name="GetPrice with invalid product should return NOT_FOUND",
         protocol="gRPC",
         service="pricing-service",
         endpoint="PricingService/GetPrice",
@@ -89,4 +89,3 @@ def test_stream_prices_should_return_five_price_updates(record_case):
     )
     assert call["response_status"] == "OK"
     assert len(updates) == 5
-

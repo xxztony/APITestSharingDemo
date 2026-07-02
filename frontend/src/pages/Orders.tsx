@@ -11,7 +11,7 @@ const { Text, Title } = Typography;
 interface Order {
   orderId: string;
   accountId: string;
-  symbol: string;
+  product: string;
   side: "BUY" | "SELL";
   quantity: number;
   price: number;
@@ -23,7 +23,7 @@ interface Order {
 
 interface OrderForm {
   accountId: string;
-  symbol: string;
+  product: string;
   side: "BUY" | "SELL";
   quantity: number;
   price: number;
@@ -61,7 +61,7 @@ export default function Orders() {
   }
 
   async function createInvalidOrder() {
-    const payload = { accountId: "ACC001", symbol: "LME-CA", side: "BUY", quantity: -1, price: 9125.5 };
+    const payload = { accountId: "ACC001", product: "LME-CA", side: "BUY", quantity: -1, price: 9125.5 };
     setLoading(true);
     const result = await apiPost<Order>("/api/orders", payload);
     setLoading(false);
@@ -87,7 +87,7 @@ export default function Orders() {
   const columns: ColumnsType<Order> = [
     { title: "Order ID", dataIndex: "orderId", width: 190 },
     { title: "Account", dataIndex: "accountId", width: 110 },
-    { title: "Symbol", dataIndex: "symbol", width: 110 },
+    { title: "Product", dataIndex: "product", width: 110 },
     { title: "Side", dataIndex: "side", width: 90 },
     { title: "Qty", dataIndex: "quantity", width: 90 },
     { title: "Price", dataIndex: "price", width: 110 },
@@ -127,13 +127,13 @@ export default function Orders() {
           form={form}
           layout="vertical"
           className="order-form-grid"
-          initialValues={{ accountId: "ACC001", symbol: "LME-CA", side: "BUY", quantity: 10, price: 9125.5 }}
+          initialValues={{ accountId: "ACC001", product: "LME-CA", side: "BUY", quantity: 10, price: 9125.5 }}
           onFinish={(values) => void createOrder(values)}
         >
           <Form.Item label="Account" name="accountId" rules={[{ required: true }]}>
             <Select options={["ACC001", "ACC002", "ACC003"].map((value) => ({ value, label: value }))} />
           </Form.Item>
-          <Form.Item label="Symbol" name="symbol" rules={[{ required: true }]}>
+          <Form.Item label="Product" name="product" rules={[{ required: true }]}>
             <Select options={["LME-CA", "LME-AL", "LME-ZN", "LME-NI"].map((value) => ({ value, label: value }))} />
           </Form.Item>
           <Form.Item label="Side" name="side" rules={[{ required: true }]}>
@@ -178,4 +178,3 @@ export default function Orders() {
     </div>
   );
 }
-

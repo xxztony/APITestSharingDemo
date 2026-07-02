@@ -16,7 +16,7 @@ query Portfolio($accountId: String!) {
     usedLimit
     availableLimit
     positions {
-      symbol
+      product
       quantity
       averagePrice
       marketValue
@@ -34,7 +34,7 @@ mutation UpdateRiskLimit($accountId: String!, $limit: Float!) {
     usedLimit
     availableLimit
     positions {
-      symbol
+      product
       quantity
       averagePrice
       marketValue
@@ -79,4 +79,3 @@ async def get_portfolio(account_id: str) -> dict:
 async def update_risk_limit(account_id: str, limit: float) -> dict:
     data = await _post_graphql(UPDATE_RISK_LIMIT_MUTATION, {"accountId": account_id, "limit": limit})
     return data["updateRiskLimit"]
-

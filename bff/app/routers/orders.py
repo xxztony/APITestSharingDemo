@@ -10,9 +10,10 @@ router = APIRouter(tags=["orders"])
 async def list_orders(
     accountId: str | None = Query(default=None),
     status: str | None = Query(default=None),
+    product: str | None = Query(default=None),
     symbol: str | None = Query(default=None),
 ) -> dict:
-    orders = await order_client.list_orders(account_id=accountId, status=status, symbol=symbol)
+    orders = await order_client.list_orders(account_id=accountId, status=status, product=product or symbol)
     return success_response(orders)
 
 
@@ -29,4 +30,3 @@ async def create_order(payload: dict) -> dict:
 @router.patch("/orders/{order_id}/cancel")
 async def cancel_order(order_id: str) -> dict:
     return success_response(await order_client.cancel_order(order_id))
-

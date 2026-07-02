@@ -14,7 +14,7 @@ def order_to_dict(order: Order) -> dict:
     return {
         "orderId": order.order_id,
         "accountId": order.account_id,
-        "symbol": order.symbol,
+        "product": order.symbol,
         "side": order.side,
         "quantity": order.quantity,
         "price": float(order.price),
@@ -86,7 +86,7 @@ def create_order(db: Session, payload: OrderCreate) -> dict:
     order = Order(
         order_id=f"ORD-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}-{uuid4().hex[:8].upper()}",
         account_id=payload.account_id,
-        symbol=payload.symbol,
+        symbol=payload.product,
         side=payload.side,
         quantity=payload.quantity,
         price=Decimal(str(payload.price)),
@@ -99,14 +99,14 @@ def create_order(db: Session, payload: OrderCreate) -> dict:
     return order_to_dict(order)
 
 
-def list_orders(db: Session, account_id: str | None = None, status: str | None = None, symbol: str | None = None) -> list[dict]:
+def list_orders(db: Session, account_id: str | None = None, status: str | None = None, product: str | None = None) -> list[dict]:
     statement = select(Order).order_by(Order.created_at.desc())
     if account_id:
         statement = statement.where(Order.account_id == account_id)
     if status:
         statement = statement.where(Order.status == status)
-    if symbol:
-        statement = statement.where(Order.symbol == symbol)
+    if product:
+        statement = statement.where(Order.symbol == product)
     return [order_to_dict(order) for order in db.scalars(statement).all()]
 
 
@@ -140,4 +140,3 @@ def cancel_order(db: Session, order_id: str) -> dict:
         db.commit()
         db.refresh(order)
     return order_to_dict(order)
-

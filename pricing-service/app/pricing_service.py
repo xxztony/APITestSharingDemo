@@ -22,8 +22,8 @@ BASE_PRICES = {
 }
 
 
-def _price_response(symbol: str) -> pricing_pb2.PriceResponse:
-    base_price = BASE_PRICES[symbol]
+def _price_response(product: str) -> pricing_pb2.PriceResponse:
+    base_price = BASE_PRICES[product]
     drift = random.uniform(-base_price * 0.0015, base_price * 0.0015)
     fair = base_price + drift
     spread = max(base_price * 0.0008, 0.05)
@@ -31,7 +31,7 @@ def _price_response(symbol: str) -> pricing_pb2.PriceResponse:
     ask = round(fair + spread / 2, 4)
     mid = round((bid + ask) / 2, 4)
     return pricing_pb2.PriceResponse(
-        symbol=symbol,
+        product=product,
         bid=bid,
         ask=ask,
         mid=mid,
@@ -42,16 +42,15 @@ def _price_response(symbol: str) -> pricing_pb2.PriceResponse:
 
 class PricingService(pricing_pb2_grpc.PricingServiceServicer):
     def GetPrice(self, request: pricing_pb2.PriceRequest, context: grpc.ServicerContext) -> pricing_pb2.PriceResponse:
-        symbol = request.symbol.upper()
-        if symbol not in BASE_PRICES:
-            context.abort(grpc.StatusCode.NOT_FOUND, f"Symbol {request.symbol} not found")
-        return _price_response(symbol)
+        product = request.product.upper()
+        if product not in BASE_PRICES:
+            context.abort(grpc.StatusCode.NOT_FOUND, f"Product {request.product} not found")
+        return _price_response(product)
 
     def StreamPrices(self, request: pricing_pb2.PriceRequest, context: grpc.ServicerContext):
-        symbol = request.symbol.upper()
-        if symbol not in BASE_PRICES:
-            context.abort(grpc.StatusCode.NOT_FOUND, f"Symbol {request.symbol} not found")
+        product = request.product.upper()
+        if product not in BASE_PRICES:
+            context.abort(grpc.StatusCode.NOT_FOUND, f"Product {request.product} not found")
         for _ in range(5):
-            yield _price_response(symbol)
+            yield _price_response(product)
             time.sleep(0.25)
-

@@ -8,7 +8,7 @@ import MetricCard from "../components/MetricCard";
 const { Text, Title } = Typography;
 
 interface Position {
-  symbol: string;
+  product: string;
   quantity: number;
   averagePrice: number;
   marketValue: number;
@@ -104,11 +104,11 @@ export default function Portfolio() {
             <MetricCard title="Available limit" value={`$${portfolio.availableLimit.toLocaleString()}`} tone="gray" />
           </div>
           <Table
-            rowKey="symbol"
+            rowKey="product"
             size="small"
             dataSource={portfolio.positions}
             columns={[
-              { title: "Symbol", dataIndex: "symbol" },
+              { title: "Product", dataIndex: "product" },
               { title: "Quantity", dataIndex: "quantity" },
               { title: "Average Price", dataIndex: "averagePrice" },
               { title: "Market Value", dataIndex: "marketValue", render: (value) => `$${Number(value).toLocaleString()}` }
@@ -124,4 +124,3 @@ export default function Portfolio() {
     </div>
   );
 }
-

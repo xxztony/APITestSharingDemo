@@ -10,7 +10,7 @@ from app.service import get_portfolio_record, update_risk_limit
 
 @strawberry.type
 class PositionType:
-    symbol: str
+    product: str
     quantity: int
     average_price: float
     market_value: float
@@ -32,7 +32,7 @@ def _decimal_to_float(value: Decimal | float | int) -> float:
 
 def _position_to_type(position: Position) -> PositionType:
     return PositionType(
-        symbol=position.symbol,
+        product=position.symbol,
         quantity=position.quantity,
         average_price=_decimal_to_float(position.average_price),
         market_value=_decimal_to_float(position.market_value),
@@ -75,4 +75,3 @@ schema = strawberry.Schema(
     mutation=Mutation,
     config=StrawberryConfig(auto_camel_case=True),
 )
-

@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package pricing;
+
+service PricingService {
+  rpc GetPrice (PriceRequest) returns (PriceResponse);
+  rpc StreamPrices (PriceRequest) returns (stream PriceResponse);
+}
+
+message PriceRequest {
+  string symbol = 1;
+}
+
+message PriceResponse {
+  string symbol = 1;
+  double bid = 2;
+  double ask = 3;
+  double mid = 4;
+  string timestamp = 5;
+  string source = 6;
+}
+

@@ -1,0 +1,153 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: trading-demo-mysql
+    environment:
+      MYSQL_DATABASE: trading_demo
+      MYSQL_USER: demo_user
+      MYSQL_PASSWORD: demo_password
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./database/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u demo_user -pdemo_password --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    networks:
+      - trading-demo
+
+  mongodb:
+    image: mongo:7.0
+    container_name: trading-demo-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+      - ./database/mongodb/init.js:/docker-entrypoint-initdb.d/init.js:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval \"db.adminCommand('ping').ok\""]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    networks:
+      - trading-demo
+
+  order-service:
+    build: ./order-service
+    container_name: trading-demo-order-service
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: trading_demo
+      MYSQL_USER: demo_user
+      MYSQL_PASSWORD: demo_password
+    ports:
+      - "8001:8001"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - trading-demo
+
+  portfolio-service:
+    build: ./portfolio-service
+    container_name: trading-demo-portfolio-service
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: trading_demo
+      MYSQL_USER: demo_user
+      MYSQL_PASSWORD: demo_password
+    ports:
+      - "8002:8002"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - trading-demo
+
+  pricing-service:
+    build: ./pricing-service
+    container_name: trading-demo-pricing-service
+    ports:
+      - "50051:50051"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import grpc; ch=grpc.insecure_channel('localhost:50051'); grpc.channel_ready_future(ch).result(timeout=2)\""]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    networks:
+      - trading-demo
+
+  test-runner-service:
+    build: ./test-runner-service
+    container_name: trading-demo-test-runner-service
+    environment:
+      MONGODB_URL: mongodb://mongodb:27017
+      MONGODB_DATABASE: qa_results
+      ORDER_SERVICE_URL: http://order-service:8001
+      PORTFOLIO_SERVICE_URL: http://portfolio-service:8002/graphql
+      PRICING_SERVICE_HOST: pricing-service
+      PRICING_SERVICE_PORT: 50051
+    ports:
+      - "8004:8004"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      order-service:
+        condition: service_started
+      portfolio-service:
+        condition: service_started
+      pricing-service:
+        condition: service_healthy
+    networks:
+      - trading-demo
+
+  bff:
+    build: ./bff
+    container_name: trading-demo-bff
+    environment:
+      ORDER_SERVICE_URL: http://order-service:8001
+      PORTFOLIO_SERVICE_URL: http://portfolio-service:8002/graphql
+      PRICING_SERVICE_HOST: pricing-service
+      PRICING_SERVICE_PORT: 50051
+      TEST_RUNNER_URL: http://test-runner-service:8004
+    ports:
+      - "8000:8000"
+    depends_on:
+      order-service:
+        condition: service_started
+      portfolio-service:
+        condition: service_started
+      pricing-service:
+        condition: service_healthy
+      test-runner-service:
+        condition: service_started
+    networks:
+      - trading-demo
+
+  frontend:
+    build: ./frontend
+    container_name: trading-demo-frontend
+    environment:
+      VITE_BFF_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      bff:
+        condition: service_started
+    networks:
+      - trading-demo
+
+networks:
+  trading-demo:
+    driver: bridge
+
+volumes:
+  mysql-data:
+  mongo-data:
+

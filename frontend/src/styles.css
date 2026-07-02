@@ -1,0 +1,286 @@
+:root {
+  color: #172026;
+  background: #eef3f7;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: #eef3f7;
+}
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.sidebar {
+  background: #10212b !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar .ant-menu {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.74);
+  border-inline-end: 0 !important;
+  padding: 8px;
+}
+
+.sidebar .ant-menu-item {
+  border-radius: 8px;
+  margin-inline: 0;
+  width: 100%;
+}
+
+.sidebar .ant-menu-item-selected {
+  background: #0f766e !important;
+  color: #ffffff !important;
+}
+
+.brand-panel {
+  min-height: 84px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 18px 14px;
+}
+
+.brand-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  background: #0f766e;
+  font-size: 20px;
+  flex: 0 0 auto;
+}
+
+.brand-copy .ant-typography {
+  margin: 0;
+  color: #ffffff;
+}
+
+.brand-copy span.ant-typography {
+  color: rgba(255, 255, 255, 0.64);
+  font-size: 12px;
+}
+
+.content-shell {
+  padding: 28px;
+  background: #eef3f7;
+}
+
+.page-stack {
+  max-width: 1480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.page-header h2.ant-typography {
+  margin: 2px 0 0;
+}
+
+.page-kicker {
+  color: #0f766e;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.metric-card {
+  min-height: 132px;
+  border: 1px solid #d9e3ea;
+}
+
+.metric-card .ant-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.metric-card h3.ant-typography {
+  margin: 0;
+  color: #172026;
+  line-height: 1.15;
+}
+
+.metric-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.metric-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-size: 17px;
+}
+
+.metric-card-teal .metric-icon,
+.metric-card-teal {
+  background: #f0fdfa;
+}
+
+.metric-card-teal .metric-icon {
+  color: #0f766e;
+}
+
+.metric-card-blue .metric-icon,
+.metric-card-blue {
+  background: #eff6ff;
+}
+
+.metric-card-blue .metric-icon {
+  color: #2563eb;
+}
+
+.metric-card-amber .metric-icon,
+.metric-card-amber {
+  background: #fffbeb;
+}
+
+.metric-card-amber .metric-icon {
+  color: #d97706;
+}
+
+.metric-card-red .metric-icon,
+.metric-card-red {
+  background: #fef2f2;
+}
+
+.metric-card-red .metric-icon {
+  color: #dc2626;
+}
+
+.metric-card-gray .metric-icon,
+.metric-card-gray {
+  background: #f8fafc;
+}
+
+.metric-card-gray .metric-icon {
+  color: #475569;
+}
+
+.panel-card {
+  border: 1px solid #d9e3ea;
+}
+
+.json-card {
+  border: 1px solid #d9e3ea;
+}
+
+.json-viewer {
+  margin: 0;
+  padding: 12px;
+  min-height: 132px;
+  max-height: 360px;
+  overflow: auto;
+  border-radius: 8px;
+  background: #0f172a;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.json-viewer .ant-typography {
+  color: #dbeafe;
+  font-size: 12px;
+  line-height: 1.6;
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+}
+
+.signal-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 36px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e5edf3;
+}
+
+.signal-row:last-child {
+  border-bottom: 0;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.control-wide {
+  width: 180px;
+}
+
+.order-form-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(140px, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.order-form-grid .ant-form-item {
+  margin-bottom: 0;
+}
+
+.two-column {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.metric-grid-four {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 1100px) {
+  .order-form-grid {
+    grid-template-columns: repeat(3, minmax(140px, 1fr));
+  }
+
+  .metric-grid-four {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .content-shell {
+    padding: 18px;
+  }
+
+  .page-header {
+    flex-direction: column;
+  }
+
+  .order-form-grid,
+  .two-column,
+  .metric-grid-four {
+    grid-template-columns: 1fr;
+  }
+
+  .control-wide {
+    width: 100%;
+  }
+}
+

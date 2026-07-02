@@ -5,12 +5,19 @@ from fastapi.responses import JSONResponse
 
 from app.models.common import ServiceError, error_payload, success_response
 from app.routers import dashboard, orders, portfolio, pricing, test_runs
+from app.tracing import configure_tracing, instrument_fastapi_app, instrument_grpc_client, instrument_httpx_client
+
+configure_tracing("bff")
+instrument_httpx_client()
+instrument_grpc_client()
 
 app = FastAPI(
     title="Trading QA BFF",
     description="Frontend-facing API gateway for the trading QA demo platform.",
     version="1.0.0",
 )
+
+instrument_fastapi_app(app)
 
 app.add_middleware(
     CORSMiddleware,
@@ -47,4 +54,3 @@ app.include_router(orders.router, prefix="/api")
 app.include_router(portfolio.router, prefix="/api")
 app.include_router(pricing.router, prefix="/api")
 app.include_router(test_runs.router, prefix="/api")
-

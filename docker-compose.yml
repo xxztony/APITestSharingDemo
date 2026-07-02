@@ -1,4 +1,19 @@
+x-otel-env: &otel-env
+  OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: jaeger:4317
+  OTEL_RESOURCE_ATTRIBUTES: deployment.environment=local-demo
+  OTEL_TRACES_SAMPLER: always_on
+
 services:
+  jaeger:
+    image: cr.jaegertracing.io/jaegertracing/jaeger:2.19.0
+    container_name: trading-demo-jaeger
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+    networks:
+      - trading-demo
+
   mysql:
     image: mysql:8.0
     container_name: trading-demo-mysql
@@ -40,6 +55,8 @@ services:
     build: ./order-service
     container_name: trading-demo-order-service
     environment:
+      <<: *otel-env
+      OTEL_SERVICE_NAME: order-service
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306
       MYSQL_DATABASE: trading_demo
@@ -48,6 +65,8 @@ services:
     ports:
       - "8001:8001"
     depends_on:
+      jaeger:
+        condition: service_started
       mysql:
         condition: service_healthy
     networks:
@@ -57,6 +76,8 @@ services:
     build: ./portfolio-service
     container_name: trading-demo-portfolio-service
     environment:
+      <<: *otel-env
+      OTEL_SERVICE_NAME: portfolio-service
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306
       MYSQL_DATABASE: trading_demo
@@ -65,6 +86,8 @@ services:
     ports:
       - "8002:8002"
     depends_on:
+      jaeger:
+        condition: service_started
       mysql:
         condition: service_healthy
     networks:
@@ -73,8 +96,14 @@ services:
   pricing-service:
     build: ./pricing-service
     container_name: trading-demo-pricing-service
+    environment:
+      <<: *otel-env
+      OTEL_SERVICE_NAME: pricing-service
     ports:
       - "50051:50051"
+    depends_on:
+      jaeger:
+        condition: service_started
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import grpc; ch=grpc.insecure_channel('localhost:50051'); grpc.channel_ready_future(ch).result(timeout=2)\""]
       interval: 10s
@@ -87,6 +116,8 @@ services:
     build: ./test-runner-service
     container_name: trading-demo-test-runner-service
     environment:
+      <<: *otel-env
+      OTEL_SERVICE_NAME: test-runner-service
       MONGODB_URL: mongodb://mongodb:27017
       MONGODB_DATABASE: qa_results
       ORDER_SERVICE_URL: http://order-service:8001
@@ -96,6 +127,8 @@ services:
     ports:
       - "8004:8004"
     depends_on:
+      jaeger:
+        condition: service_started
       mongodb:
         condition: service_healthy
       order-service:
@@ -111,6 +144,8 @@ services:
     build: ./bff
     container_name: trading-demo-bff
     environment:
+      <<: *otel-env
+      OTEL_SERVICE_NAME: bff
       ORDER_SERVICE_URL: http://order-service:8001
       PORTFOLIO_SERVICE_URL: http://portfolio-service:8002/graphql
       PRICING_SERVICE_HOST: pricing-service
@@ -119,6 +154,8 @@ services:
     ports:
       - "8000:8000"
     depends_on:
+      jaeger:
+        condition: service_started
       order-service:
         condition: service_started
       portfolio-service:
@@ -150,4 +187,3 @@ networks:
 volumes:
   mysql-data:
   mongo-data:
-

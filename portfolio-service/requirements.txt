@@ -5,3 +5,8 @@ PyMySQL==1.1.1
 strawberry-graphql[fastapi]==0.255.0
 pydantic==2.10.4
 cryptography==44.0.0
+opentelemetry-api==1.29.0
+opentelemetry-sdk==1.29.0
+opentelemetry-exporter-otlp-proto-grpc==1.29.0
+opentelemetry-instrumentation-fastapi==0.50b0
+opentelemetry-instrumentation-sqlalchemy==0.50b0

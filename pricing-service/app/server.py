@@ -4,6 +4,10 @@ import grpc
 from grpc_reflection.v1alpha import reflection
 
 from app.pricing_service import pricing_pb2, pricing_pb2_grpc, PricingService
+from app.tracing import configure_tracing, instrument_grpc_server
+
+configure_tracing("pricing-service")
+instrument_grpc_server()
 
 
 def serve() -> None:
@@ -24,4 +28,3 @@ def serve() -> None:
 
 if __name__ == "__main__":
     serve()
-

@@ -6,6 +6,10 @@ from strawberry.fastapi import GraphQLRouter
 from app.database import Base, SessionLocal, engine, wait_for_database
 from app.schema import schema
 from app.service import seed_portfolios
+from app.tracing import configure_tracing, instrument_fastapi_app, instrument_sqlalchemy_engine
+
+configure_tracing("portfolio-service")
+instrument_sqlalchemy_engine(engine)
 
 
 @asynccontextmanager
@@ -24,6 +28,8 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+instrument_fastapi_app(app)
+
 
 @app.get("/health", tags=["health"])
 def health() -> dict:
@@ -31,4 +37,3 @@ def health() -> dict:
 
 
 app.include_router(GraphQLRouter(schema), prefix="/graphql")
-

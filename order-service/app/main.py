@@ -5,6 +5,10 @@ from fastapi import FastAPI
 from app.database import Base, SessionLocal, engine, wait_for_database
 from app.routers.orders import router as orders_router
 from app.service import seed_orders
+from app.tracing import configure_tracing, instrument_fastapi_app, instrument_sqlalchemy_engine
+
+configure_tracing("order-service")
+instrument_sqlalchemy_engine(engine)
 
 
 @asynccontextmanager
@@ -23,6 +27,8 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+instrument_fastapi_app(app)
+
 
 @app.get("/health", tags=["health"])
 def health() -> dict:
@@ -30,4 +36,3 @@ def health() -> dict:
 
 
 app.include_router(orders_router)
-

@@ -19,6 +19,11 @@ flowchart TD
   Orders --> MySQL[("MySQL trading_demo")]
   Portfolio --> MySQL
   Runner --> Mongo[("MongoDB qa_results")]
+  BFF -. OTLP .-> Jaeger["Jaeger UI :16686"]
+  Orders -. OTLP .-> Jaeger
+  Portfolio -. OTLP .-> Jaeger
+  Pricing -. OTLP .-> Jaeger
+  Runner -. OTLP .-> Jaeger
 ```
 
 ## Services
@@ -31,6 +36,7 @@ flowchart TD
 | portfolio-service | FastAPI, Strawberry GraphQL, MySQL | 8002 | Account portfolio and risk limit |
 | pricing-service | Python grpcio | 50051 | Unary and streaming price APIs |
 | test-runner-service | FastAPI, pytest, MongoDB | 8004 | Runs API regression tests and stores results |
+| jaeger | Jaeger, OpenTelemetry OTLP | 16686, 4317, 4318 | Trace collection and UI |
 | mysql | MySQL 8 | 3306 | Business data |
 | mongodb | MongoDB 7 | 27017 | Test results and API logs |
 
@@ -47,6 +53,7 @@ Then open:
 - Order service OpenAPI: http://localhost:8001/docs
 - Portfolio GraphQL: http://localhost:8002/graphql
 - Test runner OpenAPI: http://localhost:8004/docs
+- Jaeger tracing UI: http://localhost:16686
 
 ## Demo Flow
 
@@ -61,6 +68,26 @@ Then open:
 9. Run the stream demo.
 10. Open Test Runs and click Run API Regression.
 11. Review REST, GraphQL, and gRPC case details.
+12. Open Tracing and generate a Dashboard or Regression trace.
+13. Open Jaeger and search for `bff` or `test-runner-service`.
+
+## Distributed Tracing
+
+The Python services are instrumented with OpenTelemetry and export traces to Jaeger over OTLP gRPC.
+
+Jaeger endpoints:
+
+- UI: http://localhost:16686
+- OTLP gRPC collector: `jaeger:4317` inside Docker, `localhost:4317` from the host
+- OTLP HTTP collector: `localhost:4318`
+
+Good traces to demo:
+
+- Dashboard fan-out: `bff -> order-service / pricing-service / test-runner-service`
+- Portfolio query: `bff -> portfolio-service -> MySQL`
+- Regression run: `bff -> test-runner-service -> order-service / portfolio-service / pricing-service -> MongoDB`
+
+The frontend Tracing page can generate demo traffic and open Jaeger directly.
 
 ## BFF APIs
 

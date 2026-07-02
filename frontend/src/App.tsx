@@ -2,6 +2,7 @@ import {
   ApiOutlined,
   BarChartOutlined,
   CloudServerOutlined,
+  DeploymentUnitOutlined,
   DollarOutlined,
   ExperimentOutlined,
   FileSearchOutlined
@@ -13,11 +14,12 @@ import Orders from "./pages/Orders";
 import Portfolio from "./pages/Portfolio";
 import Pricing from "./pages/Pricing";
 import TestRuns from "./pages/TestRuns";
+import Tracing from "./pages/Tracing";
 
 const { Sider, Content } = Layout;
 const { Text, Title } = Typography;
 
-type PageKey = "dashboard" | "orders" | "portfolio" | "pricing" | "test-runs";
+type PageKey = "dashboard" | "orders" | "portfolio" | "pricing" | "test-runs" | "tracing";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<PageKey>("dashboard");
@@ -32,6 +34,8 @@ export default function App() {
         return <Pricing />;
       case "test-runs":
         return <TestRuns />;
+      case "tracing":
+        return <Tracing />;
       default:
         return <Dashboard />;
     }
@@ -73,7 +77,8 @@ export default function App() {
               { key: "orders", icon: <FileSearchOutlined />, label: "Orders" },
               { key: "portfolio", icon: <DollarOutlined />, label: "Portfolio" },
               { key: "pricing", icon: <CloudServerOutlined />, label: "Pricing" },
-              { key: "test-runs", icon: <ExperimentOutlined />, label: "Test Runs" }
+              { key: "test-runs", icon: <ExperimentOutlined />, label: "Test Runs" },
+              { key: "tracing", icon: <DeploymentUnitOutlined />, label: "Tracing" }
             ]}
           />
         </Sider>
@@ -84,4 +89,3 @@ export default function App() {
     </ConfigProvider>
   );
 }
-

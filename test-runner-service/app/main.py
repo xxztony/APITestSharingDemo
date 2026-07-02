@@ -2,6 +2,13 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from app.tracing import configure_tracing, instrument_fastapi_app, instrument_grpc_client, instrument_httpx_client, instrument_pymongo
+
+configure_tracing("test-runner-service")
+instrument_httpx_client()
+instrument_grpc_client()
+instrument_pymongo()
+
 from app.mongodb import ensure_indexes
 from app.routers.test_runs import router as test_runs_router
 
@@ -19,6 +26,8 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+instrument_fastapi_app(app)
+
 
 @app.get("/health", tags=["health"])
 def health() -> dict:
@@ -26,4 +35,3 @@ def health() -> dict:
 
 
 app.include_router(test_runs_router)
-

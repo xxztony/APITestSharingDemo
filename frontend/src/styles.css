@@ -305,6 +305,30 @@ body {
   gap: 16px;
 }
 
+.price-chart-card .ant-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chart-loading {
+  min-height: 300px;
+  display: grid;
+  place-items: center;
+  color: #5b6b76;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.price-chart-summary {
+  display: grid;
+  grid-template-columns: max-content max-content max-content max-content;
+  gap: 8px 12px;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1px solid #e5edf3;
+}
+
 @media (max-width: 1100px) {
   .order-form-grid {
     grid-template-columns: repeat(3, minmax(140px, 1fr));
@@ -328,6 +352,10 @@ body {
   .two-column,
   .metric-grid-four {
     grid-template-columns: 1fr;
+  }
+
+  .price-chart-summary {
+    grid-template-columns: max-content 1fr;
   }
 
   .control-wide {

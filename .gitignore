@@ -6,6 +6,6 @@ __pycache__/
 .venv/
 .env
 *.log
+outputs/
 app/generated/pricing_pb2.py
 app/generated/pricing_pb2_grpc.py
-

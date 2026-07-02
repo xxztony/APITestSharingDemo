@@ -299,6 +299,12 @@ body {
   gap: 16px;
 }
 
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
 .metric-grid-four {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -329,9 +335,50 @@ body {
   border-top: 1px solid #e5edf3;
 }
 
+.proto-card .ant-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.proto-meta {
+  display: grid;
+  grid-template-columns: max-content 1fr max-content max-content;
+  gap: 8px 10px;
+  align-items: center;
+}
+
+.proto-viewer {
+  min-height: 176px;
+  max-height: 260px;
+}
+
+.proto-base64 {
+  margin: 0;
+  padding: 10px;
+  max-height: 86px;
+  overflow: auto;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #d9e3ea;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.proto-base64 .ant-typography {
+  color: #334155;
+  font-size: 12px;
+  line-height: 1.5;
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+}
+
 @media (max-width: 1100px) {
   .order-form-grid {
     grid-template-columns: repeat(3, minmax(140px, 1fr));
+  }
+
+  .evidence-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .metric-grid-four {
@@ -350,11 +397,16 @@ body {
 
   .order-form-grid,
   .two-column,
+  .evidence-grid,
   .metric-grid-four {
     grid-template-columns: 1fr;
   }
 
   .price-chart-summary {
+    grid-template-columns: max-content 1fr;
+  }
+
+  .proto-meta {
     grid-template-columns: max-content 1fr;
   }
 

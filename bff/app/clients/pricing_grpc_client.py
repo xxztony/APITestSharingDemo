@@ -1,9 +1,11 @@
 import asyncio
+import base64
 import os
 import sys
 from pathlib import Path
 
 import grpc
+from google.protobuf import text_format
 
 from app.models.common import ServiceError
 
@@ -23,6 +25,7 @@ def _target() -> str:
 
 
 def _to_dict(response: pricing_pb2.PriceResponse) -> dict:
+    serialized = response.SerializeToString()
     return {
         "product": response.product,
         "bid": response.bid,
@@ -30,6 +33,12 @@ def _to_dict(response: pricing_pb2.PriceResponse) -> dict:
         "mid": response.mid,
         "timestamp": response.timestamp,
         "source": response.source,
+        "proto": {
+            "type": "pricing.PriceResponse",
+            "text": text_format.MessageToString(response).strip(),
+            "serializedBase64": base64.b64encode(serialized).decode("ascii"),
+            "serializedBytes": len(serialized),
+        },
     }
 
 

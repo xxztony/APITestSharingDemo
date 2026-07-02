@@ -18,6 +18,14 @@ interface Price {
   mid: number;
   timestamp: string;
   source: string;
+  proto?: ProtoMessage;
+}
+
+interface ProtoMessage {
+  type: string;
+  text: string;
+  serializedBase64: string;
+  serializedBytes: number;
 }
 
 interface StreamResponse {
@@ -52,6 +60,31 @@ function appendHistory(history: Record<string, Price[]>, selectedProduct: string
     ...history,
     [selectedProduct]: unique.slice(-MAX_HISTORY_POINTS)
   };
+}
+
+function ProtoMessageViewer({ proto }: { proto?: ProtoMessage }) {
+  return (
+    <Card className="json-card proto-card" size="small" title="Original protobuf message">
+      {proto ? (
+        <>
+          <div className="proto-meta">
+            <Text type="secondary">Type</Text>
+            <Text strong>{proto.type}</Text>
+            <Text type="secondary">Bytes</Text>
+            <Text strong>{proto.serializedBytes}</Text>
+          </div>
+          <pre className="json-viewer proto-viewer">
+            <Text>{proto.text}</Text>
+          </pre>
+          <pre className="proto-base64">
+            <Text>{proto.serializedBase64}</Text>
+          </pre>
+        </>
+      ) : (
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Call a valid product to inspect the raw protobuf response" />
+      )}
+    </Card>
+  );
 }
 
 export default function Pricing() {
@@ -225,8 +258,9 @@ export default function Pricing() {
         />
       ) : null}
 
-      <div className="two-column">
+      <div className="evidence-grid">
         <JsonViewer title="BFF request" value={lastPayload} />
+        <ProtoMessageViewer proto={price?.proto} />
         <JsonViewer title="gRPC response as JSON" value={lastCall?.raw} />
       </div>
     </div>

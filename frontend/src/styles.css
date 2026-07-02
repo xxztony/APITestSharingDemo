@@ -314,25 +314,220 @@ body {
 .price-chart-card .ant-card-body {
   display: flex;
   flex-direction: column;
+  gap: 14px;
+}
+
+.market-chart-title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.market-chart-title span:first-child {
+  font-weight: 700;
+}
+
+.market-chart-title span:last-child {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.market-chart {
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 
-.chart-loading {
-  min-height: 300px;
+.market-chart-stats {
   display: grid;
-  place-items: center;
-  color: #5b6b76;
-  background: #f8fafc;
-  border-radius: 8px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
 }
 
-.price-chart-summary {
+.market-chart-stats > div {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #e5edf3;
+  border-radius: 8px;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.market-chart-stats strong {
+  color: #172026;
+  font-size: 14px;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.market-chart-stats .market-up {
+  background: #ecfdf5;
+  border-color: #bbf7d0;
+}
+
+.market-chart-stats .market-up strong {
+  color: #047857;
+}
+
+.market-chart-stats .market-down {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.market-chart-stats .market-down strong {
+  color: #b91c1c;
+}
+
+.quote-chart {
+  width: 100%;
+  min-height: 330px;
+  display: block;
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(248, 250, 252, 0.96), rgba(255, 255, 255, 1)),
+    #ffffff;
+}
+
+.quote-chart-plot {
+  fill: #ffffff;
+  stroke: #e2e8f0;
+  stroke-width: 1;
+}
+
+.quote-grid-line {
+  stroke: #dbe5ed;
+  stroke-width: 1;
+  stroke-dasharray: 4 6;
+}
+
+.quote-grid-line-vertical {
+  stroke: #e5edf3;
+}
+
+.quote-axis-label {
+  fill: #64748b;
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 11px;
+}
+
+.quote-spread-area {
+  fill: url("#quoteSpreadFill");
+}
+
+.quote-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.quote-line-bid {
+  stroke: #2563eb;
+  stroke-width: 1.6;
+  stroke-dasharray: 4 4;
+  opacity: 0.75;
+}
+
+.quote-line-ask {
+  stroke: #f97316;
+  stroke-width: 1.6;
+  stroke-dasharray: 4 4;
+  opacity: 0.75;
+}
+
+.quote-line-mid {
+  stroke: #0f766e;
+  stroke-width: 3;
+}
+
+.quote-tick line {
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.quote-tick circle {
+  stroke: #ffffff;
+  stroke-width: 2;
+}
+
+.quote-tick-up line,
+.quote-tick-up circle {
+  stroke: #16a34a;
+  fill: #16a34a;
+}
+
+.quote-tick-down line,
+.quote-tick-down circle {
+  stroke: #dc2626;
+  fill: #dc2626;
+}
+
+.quote-last-guide {
+  stroke: #0f766e;
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+.quote-last-price-up {
+  fill: #0f766e;
+}
+
+.quote-last-price-down {
+  fill: #dc2626;
+}
+
+.quote-last-price-text {
+  fill: #ffffff;
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.quote-tape {
   display: grid;
-  grid-template-columns: max-content max-content max-content max-content;
-  gap: 8px 12px;
-  align-items: center;
-  padding-top: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 6px;
+  padding-top: 10px;
   border-top: 1px solid #e5edf3;
+}
+
+.quote-tape-cell {
+  min-width: 0;
+  padding: 7px 8px;
+  border-radius: 8px;
+  border: 1px solid #e5edf3;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.quote-tape-cell strong {
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 12px;
+}
+
+.quote-tape-up {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.quote-tape-up strong {
+  color: #047857;
+}
+
+.quote-tape-down {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.quote-tape-down strong {
+  color: #b91c1c;
 }
 
 .proto-card .ant-card-body {
@@ -384,6 +579,10 @@ body {
   .metric-grid-four {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .market-chart-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 720px) {
@@ -402,8 +601,14 @@ body {
     grid-template-columns: 1fr;
   }
 
-  .price-chart-summary {
-    grid-template-columns: max-content 1fr;
+  .market-chart-title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .market-chart-stats {
+    grid-template-columns: 1fr;
   }
 
   .proto-meta {

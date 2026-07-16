@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mxfile host="app.diagrams.net" modified="2026-07-02T00:00:00.000Z" agent="Codex drawio-skill" version="26.0.0" type="device">
+<mxfile host="app.diagrams.net" modified="2026-07-16T13:25:00.000Z" agent="Codex drawio-skill" version="26.0.0" type="device">
   <diagram id="trading-qa-api-demo-architecture" name="System Architecture">
     <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1650" pageHeight="1120" math="0" shadow="0" background="#F7FAFC">
       <root>
@@ -8,7 +8,7 @@
         <mxCell id="title" value="Trading QA API Demo System Architecture" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Segoe UI;fontSize=28;fontStyle=1;fontColor=#0F172A;" vertex="1" parent="1">
           <mxGeometry x="50" y="24" width="900" height="38" as="geometry" />
         </mxCell>
-        <mxCell id="subtitle" value="Full-stack API testing showcase: React frontend, FastAPI BFF, REST / GraphQL / gRPC services, pytest runner, MySQL and MongoDB." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Segoe UI;fontSize=13;fontColor=#475569;" vertex="1" parent="1">
+        <mxCell id="subtitle" value="Full-stack API testing showcase: React frontend, Keycloak IAM, FastAPI BFF, REST / GraphQL / gRPC services, pytest runner, MySQL and MongoDB." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Segoe UI;fontSize=13;fontColor=#475569;" vertex="1" parent="1">
           <mxGeometry x="52" y="66" width="1180" height="24" as="geometry" />
         </mxCell>
         <mxCell id="docker_network" value="Docker Compose Network: trading-demo" style="swimlane;html=1;whiteSpace=wrap;rounded=0;collapsible=0;recursiveResize=0;startSize=36;container=1;pointerEvents=0;fontFamily=Segoe UI;fontSize=15;fontStyle=1;fontColor=#0F172A;fillColor=#FFFFFF;strokeColor=#CBD5E1;strokeWidth=2;swimlaneFillColor=#E2E8F0;horizontal=1;" vertex="1" parent="1">
@@ -46,6 +46,15 @@
         </mxCell>
         <mxCell id="bff_badge" value="localhost:8000 fan-out" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;fillColor=#D1FAE5;strokeColor=#34D399;fontFamily=Segoe UI;fontSize=11;fontColor=#047857;align=center;verticalAlign=middle;" vertex="1" parent="1">
           <mxGeometry x="950" y="448" width="160" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="keycloak" value="Keycloak IAM&#xa;OIDC login + JWT identity" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#ECFEFF;strokeColor=#0891B2;strokeWidth=2;fontFamily=Segoe UI;fontSize=13;fontColor=#0F172A;align=center;verticalAlign=top;spacing=0;spacingTop=18;spacingBottom=34;spacingLeft=68;spacingRight=12;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="190" y="390" width="360" height="84" as="geometry" />
+        </mxCell>
+        <mxCell id="keycloak_badge" value="realm: trading-demo  :8180" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;fillColor=#CFFAFE;strokeColor=#22D3EE;fontFamily=Segoe UI;fontSize=11;fontColor=#0E7490;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="290" y="448" width="190" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="keycloak_icon" value="" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#DD344C;strokeColor=#FFFFFF;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.identity_and_access_management;" vertex="1" parent="1">
+          <mxGeometry x="212" y="400" width="62" height="62" as="geometry" />
         </mxCell>
         <mxCell id="order_icon" value="" style="aspect=fixed;sketch=0;html=1;dashed=0;whitespace=wrap;verticalLabelPosition=bottom;verticalAlign=top;fillColor=#0284C7;strokeColor=#FFFFFF;points=[[0.005,0.63,0],[0.1,0.2,0],[0.9,0.2,0],[0.5,0,0],[0.995,0.63,0],[0.72,0.99,0],[0.5,1,0],[0.28,0.99,0]];shape=mxgraph.kubernetes.icon2;prIcon=api;" vertex="1" parent="1">
           <mxGeometry x="176" y="637" width="50" height="48" as="geometry" />
@@ -101,10 +110,21 @@
         <mxCell id="mongo" value="MongoDB 7&#xa;qa_results&#xa;test_runs / test_cases / api_logs&#xa;localhost:27017" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#FEF9C3;strokeColor=#65A30D;strokeWidth=2;fontFamily=Segoe UI;fontSize=12;fontColor=#0F172A;align=center;verticalAlign=middle;spacingTop=10;" vertex="1" parent="1">
           <mxGeometry x="980" y="880" width="300" height="98" as="geometry" />
         </mxCell>
-        <mxCell id="legend" value="Solid blue: frontend and BFF runtime calls    |    Dashed violet: pytest regression calls    |    Green: persistence writes/reads" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#F8FAFC;strokeColor=#CBD5E1;fontFamily=Segoe UI;fontSize=12;fontColor=#334155;align=center;verticalAlign=middle;spacing=6;" vertex="1" parent="1">
+        <mxCell id="legend" value="Blue: runtime API calls    |    Cyan: OIDC / JWT identity    |    Dashed violet: pytest regression calls    |    Green: persistence" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;fillColor=#F8FAFC;strokeColor=#CBD5E1;fontFamily=Segoe UI;fontSize=12;fontColor=#334155;align=center;verticalAlign=middle;spacing=6;" vertex="1" parent="1">
           <mxGeometry x="250" y="990" width="1150" height="42" as="geometry" />
         </mxCell>
         <mxCell id="e_frontend_bff" value="HTTP JSON" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2.5;strokeColor=#2563EB;endArrow=block;endFill=1;fontFamily=Segoe UI;fontSize=11;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="frontend" target="bff">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_frontend_keycloak" value="OIDC Authorization Code + PKCE" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2.5;strokeColor=#0891B2;endArrow=block;endFill=1;fontFamily=Segoe UI;fontSize=11;fontColor=#155E75;labelBackgroundColor=#FFFFFF;exitX=0.15;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="frontend" target="keycloak">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="904" y="338" />
+              <mxPoint x="370" y="338" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_bff_keycloak" value="JWT validation / JWKS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2.5;strokeColor=#0891B2;endArrow=block;endFill=1;fontFamily=Segoe UI;fontSize=11;fontColor=#155E75;labelBackgroundColor=#FFFFFF;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="bff" target="keycloak">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="e_bff_order" value="REST" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2.5;strokeColor=#2563EB;endArrow=block;endFill=1;fontFamily=Segoe UI;fontSize=11;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;exitX=0.2;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="bff" target="order_service">

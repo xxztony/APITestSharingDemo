@@ -59,6 +59,8 @@ Then open:
 - Test runner OpenAPI: http://localhost:8004/docs
 - Jaeger tracing UI: http://localhost:16686
 
+For the complete local URL and demo credential inventory, see [docs/system-access.md](docs/system-access.md).
+
 ## Demo Flow
 
 1. Open http://localhost:3000 and sign in with `qa.user` / `qa123456`.

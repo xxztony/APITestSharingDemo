@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
@@ -78,7 +79,24 @@ def execute_test_run() -> dict:
     plugin = StructuredResultPlugin()
     test_dir = Path(__file__).resolve().parents[1] / "tests"
     run_started = datetime.now(timezone.utc)
-    exit_code = pytest.main(["-q", str(test_dir)], plugins=[plugin])
+    pytest_args = ["-q", str(test_dir)]
+    if os.getenv("RP_API_KEY"):
+        pytest_args.extend(
+            [
+                "--reportportal",
+                "-o",
+                f"rp_endpoint={os.getenv('RP_ENDPOINT', 'http://host.docker.internal:8080')}",
+                "-o",
+                f"rp_project={os.getenv('RP_PROJECT', 'superadmin_personal')}",
+                "-o",
+                f"rp_launch=Trading QA IAM API Demo - {run_id}",
+                "-o",
+                "rp_launch_attributes='Pytest' 'IAM' 'API' 'Environment:local'",
+                "-o",
+                "rp_log_level=INFO",
+            ]
+        )
+    exit_code = pytest.main(pytest_args, plugins=[plugin])
     run_ended = datetime.now(timezone.utc)
 
     cases = plugin.cases
@@ -146,4 +164,3 @@ def get_test_run(run_id: str) -> dict | None:
     cases = [public_doc(doc) for doc in db.test_cases.find({"run_id": run_id}, {"_id": 0}).sort("case_id", 1)]
     logs = [public_doc(doc) for doc in db.api_logs.find({"run_id": run_id}, {"_id": 0}).sort("case_id", 1)]
     return {**summary, "cases": cases, "api_logs": logs}
-

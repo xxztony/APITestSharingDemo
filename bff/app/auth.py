@@ -16,7 +16,14 @@ IAM_JWKS_URL = os.getenv(
     "IAM_JWKS_URL",
     "http://localhost:8180/realms/trading-demo/protocol/openid-connect/certs",
 )
-IAM_CLIENT_ID = os.getenv("IAM_CLIENT_ID", "trading-demo-frontend")
+IAM_CLIENT_IDS = {
+    client_id.strip()
+    for client_id in os.getenv(
+        "IAM_CLIENT_IDS",
+        os.getenv("IAM_CLIENT_ID", "trading-demo-frontend,trading-demo-tests"),
+    ).split(",")
+    if client_id.strip()
+}
 JWKS_TTL_SECONDS = int(os.getenv("IAM_JWKS_TTL_SECONDS", "300"))
 
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -94,7 +101,7 @@ async def require_authenticated_user(
             options={"verify_aud": False},
         )
         token_client = claims.get("azp") or claims.get("client_id")
-        if token_client != IAM_CLIENT_ID:
+        if token_client not in IAM_CLIENT_IDS:
             raise jwt.InvalidTokenError("Token was issued for a different client")
         return claims
     except jwt.PyJWTError as exc:

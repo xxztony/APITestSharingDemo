@@ -11,6 +11,7 @@ services:
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HOSTNAME: http://localhost:8180
     ports:
       - "8180:8080"
     volumes:
@@ -138,6 +139,15 @@ services:
       PORTFOLIO_SERVICE_URL: http://portfolio-service:8002/graphql
       PRICING_SERVICE_HOST: pricing-service
       PRICING_SERVICE_PORT: 50051
+      BFF_URL: http://bff:8000
+      IAM_TOKEN_URL: http://keycloak:8080/realms/trading-demo/protocol/openid-connect/token
+      IAM_TEST_CLIENT_ID: trading-demo-tests
+      IAM_TEST_USERNAME: qa.user
+      IAM_TEST_PASSWORD: qa123456
+      IAM_REFRESH_SKEW_SECONDS: 60
+      RP_ENDPOINT: http://host.docker.internal:8080
+      RP_PROJECT: superadmin_personal
+      RP_API_KEY: ${RP_API_KEY:-}
     ports:
       - "8004:8004"
     depends_on:
@@ -151,6 +161,8 @@ services:
         condition: service_started
       pricing-service:
         condition: service_healthy
+      keycloak:
+        condition: service_started
     networks:
       - trading-demo
 
@@ -167,7 +179,7 @@ services:
       TEST_RUNNER_URL: http://test-runner-service:8004
       IAM_ISSUER: http://localhost:8180/realms/trading-demo
       IAM_JWKS_URL: http://keycloak:8080/realms/trading-demo/protocol/openid-connect/certs
-      IAM_CLIENT_ID: trading-demo-frontend
+      IAM_CLIENT_IDS: trading-demo-frontend,trading-demo-tests
     ports:
       - "8000:8000"
     depends_on:

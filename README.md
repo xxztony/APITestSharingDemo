@@ -106,6 +106,8 @@ Demo identities:
 
 Realm: `trading-demo`; frontend client: `trading-demo-frontend`.
 
+The pytest IAM and ReportPortal walkthrough is in [docs/iam-api-testing.md](docs/iam-api-testing.md).
+
 ## BFF APIs
 
 The frontend should use these only:

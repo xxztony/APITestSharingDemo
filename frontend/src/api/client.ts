@@ -1,3 +1,5 @@
+import { getAccessToken } from "../auth/keycloak";
+
 const BASE_URL = import.meta.env.VITE_BFF_URL || "http://localhost:8000";
 
 export interface ApiError {
@@ -30,12 +32,12 @@ async function readJson(response: Response): Promise<unknown> {
 export async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<ApiCallResult<T>> {
   const started = performance.now();
   const headers = new Headers(init.headers);
-  headers.set("Authorization", "Bearer demo-token");
   if (init.body && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
   }
 
   try {
+    headers.set("Authorization", `Bearer ${await getAccessToken()}`);
     const response = await fetch(`${BASE_URL}${path}`, { ...init, headers });
     const raw = await readJson(response);
     const durationMs = Math.round((performance.now() - started) * 100) / 100;
@@ -93,4 +95,3 @@ export function apiPatch<T>(path: string, payload?: unknown) {
     body: payload === undefined ? undefined : JSON.stringify(payload)
   });
 }
-

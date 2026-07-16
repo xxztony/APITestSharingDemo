@@ -4,6 +4,20 @@ x-otel-env: &otel-env
   OTEL_TRACES_SAMPLER: always_on
 
 services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.3.3
+    container_name: trading-demo-keycloak
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    ports:
+      - "8180:8080"
+    volumes:
+      - ./infra/keycloak:/opt/keycloak/data/import:ro
+    networks:
+      - trading-demo
+
   jaeger:
     image: cr.jaegertracing.io/jaegertracing/jaeger:2.19.0
     container_name: trading-demo-jaeger
@@ -151,9 +165,14 @@ services:
       PRICING_SERVICE_HOST: pricing-service
       PRICING_SERVICE_PORT: 50051
       TEST_RUNNER_URL: http://test-runner-service:8004
+      IAM_ISSUER: http://localhost:8180/realms/trading-demo
+      IAM_JWKS_URL: http://keycloak:8080/realms/trading-demo/protocol/openid-connect/certs
+      IAM_CLIENT_ID: trading-demo-frontend
     ports:
       - "8000:8000"
     depends_on:
+      keycloak:
+        condition: service_started
       jaeger:
         condition: service_started
       order-service:
@@ -172,9 +191,14 @@ services:
     container_name: trading-demo-frontend
     environment:
       VITE_BFF_URL: http://localhost:8000
+      VITE_KEYCLOAK_URL: http://localhost:8180
+      VITE_KEYCLOAK_REALM: trading-demo
+      VITE_KEYCLOAK_CLIENT_ID: trading-demo-frontend
     ports:
       - "3000:3000"
     depends_on:
+      keycloak:
+        condition: service_started
       bff:
         condition: service_started
     networks:

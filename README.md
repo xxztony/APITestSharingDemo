@@ -8,7 +8,9 @@ The goal is a clean, demo-friendly platform rather than a real trading system. T
 
 ```mermaid
 flowchart TD
-  Frontend["React Frontend :3000"] --> BFF["FastAPI BFF :8000"]
+  User["QA User"] --> Keycloak["Keycloak IAM :8180"]
+  Keycloak -->|OIDC Code + PKCE| Frontend["React Frontend :3000"]
+  Frontend -->|Bearer access token| BFF["FastAPI BFF :8000"]
   BFF --> Orders["Order Service REST :8001"]
   BFF --> Portfolio["Portfolio Service GraphQL :8002"]
   BFF --> Pricing["Pricing Service gRPC :50051"]
@@ -31,6 +33,7 @@ flowchart TD
 | Service | Stack | Port | Purpose |
 | --- | --- | ---: | --- |
 | frontend | React, Vite, TypeScript, Ant Design | 3000 | Demo dashboard and workflows |
+| keycloak | Keycloak, OpenID Connect | 8180 | Login, users, roles, and access tokens |
 | bff | FastAPI, httpx, grpcio | 8000 | Only frontend backend entry point |
 | order-service | FastAPI, SQLAlchemy, MySQL | 8001 | REST order creation, search, cancellation |
 | portfolio-service | FastAPI, Strawberry GraphQL, MySQL | 8002 | Account portfolio and risk limit |
@@ -49,6 +52,7 @@ docker compose up --build
 Then open:
 
 - Frontend: http://localhost:3000
+- Keycloak admin: http://localhost:8180 (`admin` / `admin`)
 - BFF OpenAPI: http://localhost:8000/docs
 - Order service OpenAPI: http://localhost:8001/docs
 - Portfolio GraphQL: http://localhost:8002/graphql
@@ -57,7 +61,7 @@ Then open:
 
 ## Demo Flow
 
-1. Open http://localhost:3000.
+1. Open http://localhost:3000 and sign in with `qa.user` / `qa123456`.
 2. Review dashboard metrics and latest price.
 3. Open Orders and create a valid order.
 4. Click Invalid Order to trigger validation failure.
@@ -88,6 +92,19 @@ Good traces to demo:
 - Regression run: `bff -> test-runner-service -> order-service / portfolio-service / pricing-service -> MongoDB`
 
 The frontend Tracing page can generate demo traffic and open Jaeger directly.
+
+## Login And API Authorization
+
+The frontend uses the OpenID Connect Authorization Code flow with PKCE. Keycloak issues an access token, and the BFF verifies its signature against Keycloak JWKS plus the issuer and client identity. `/api/health` is public; all other BFF APIs require a valid bearer token.
+
+Demo identities:
+
+| Username | Password | Realm roles |
+| --- | --- | --- |
+| `qa.user` | `qa123456` | `qa_user` |
+| `qa.admin` | `admin123456` | `qa_user`, `qa_admin` |
+
+Realm: `trading-demo`; frontend client: `trading-demo-frontend`.
 
 ## BFF APIs
 
@@ -134,9 +151,14 @@ Error BFF response:
 Create a valid order through the BFF:
 
 ```bash
+TOKEN=$(curl -s -X POST http://localhost:8180/realms/trading-demo/protocol/openid-connect/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=password&client_id=trading-demo-frontend&username=qa.user&password=qa123456" \
+  | python -c "import json,sys; print(json.load(sys.stdin)['access_token'])")
+
 curl -X POST http://localhost:8000/api/orders \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer demo-token" \
+  -H "Authorization: Bearer $TOKEN" \
   -d "{\"accountId\":\"ACC001\",\"product\":\"LME-CA\",\"side\":\"BUY\",\"quantity\":10,\"price\":9125.5}"
 ```
 

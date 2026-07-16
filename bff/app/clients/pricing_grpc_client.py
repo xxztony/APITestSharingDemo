@@ -37,6 +37,7 @@ def _to_dict(response: pricing_pb2.PriceResponse) -> dict:
             "type": "pricing.PriceResponse",
             "text": text_format.MessageToString(response).strip(),
             "serializedBase64": base64.b64encode(serialized).decode("ascii"),
+            "serializedHex": serialized.hex(),
             "serializedBytes": len(serialized),
         },
     }

@@ -26,12 +26,28 @@ interface ProtoMessage {
   type: string;
   text: string;
   serializedBase64: string;
+  serializedHex?: string;
   serializedBytes: number;
 }
 
 interface StreamResponse {
   product: string;
   updates: Price[];
+}
+
+interface ProtoFrame {
+  label: string;
+  jsonPath: string;
+  proto: ProtoMessage;
+  product?: string;
+  mid?: number;
+  timestamp?: string;
+}
+
+interface HexDumpRow {
+  offset: string;
+  hex: string;
+  ascii: string;
 }
 
 function formatPrice(value: number) {
@@ -71,26 +87,169 @@ function appendHistory(history: Record<string, Price[]>, selectedProduct: string
   };
 }
 
-function ProtoMessageViewer({ proto }: { proto?: ProtoMessage }) {
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isProtoMessage(value: unknown): value is ProtoMessage {
+  if (!isRecord(value)) {
+    return false;
+  }
+
   return (
-    <Card className="json-card proto-card" size="small" title="Original protobuf message">
-      {proto ? (
+    typeof value.type === "string" &&
+    typeof value.text === "string" &&
+    typeof value.serializedBase64 === "string" &&
+    typeof value.serializedBytes === "number"
+  );
+}
+
+function getString(value: unknown) {
+  return typeof value === "string" ? value : undefined;
+}
+
+function getNumber(value: unknown) {
+  return typeof value === "number" ? value : undefined;
+}
+
+function createProtoFrame(value: unknown, jsonPath: string, label: string): ProtoFrame | null {
+  if (!isRecord(value) || !isProtoMessage(value.proto)) {
+    return null;
+  }
+
+  return {
+    label,
+    jsonPath,
+    proto: value.proto,
+    product: getString(value.product),
+    mid: getNumber(value.mid),
+    timestamp: getString(value.timestamp)
+  };
+}
+
+function collectProtoFrames(raw: unknown): ProtoFrame[] {
+  if (!isRecord(raw) || !isRecord(raw.data)) {
+    return [];
+  }
+
+  const data = raw.data;
+  const unaryFrame = createProtoFrame(data, "data.proto", "Unary response");
+  if (unaryFrame) {
+    return [unaryFrame];
+  }
+
+  if (!Array.isArray(data.updates)) {
+    return [];
+  }
+
+  return data.updates
+    .map((item, index) => createProtoFrame(item, `data.updates[${index}].proto`, `Stream frame ${index + 1}`))
+    .filter((item): item is ProtoFrame => item !== null);
+}
+
+function decodeBase64ToHex(base64: string) {
+  try {
+    const binary = atob(base64);
+    return Array.from(binary, (character) => character.charCodeAt(0).toString(16).padStart(2, "0")).join("");
+  } catch {
+    return "";
+  }
+}
+
+function formatHexDumpRows(proto: ProtoMessage): HexDumpRow[] {
+  const normalizedHex = (proto.serializedHex || decodeBase64ToHex(proto.serializedBase64)).replace(/[^0-9a-f]/gi, "").toLowerCase();
+  const bytes = normalizedHex.match(/.{1,2}/g) || [];
+  const rowSize = 16;
+
+  return Array.from({ length: Math.ceil(bytes.length / rowSize) }, (_, rowIndex) => {
+    const row = bytes.slice(rowIndex * rowSize, rowIndex * rowSize + rowSize);
+    const offset = (rowIndex * rowSize).toString(16).padStart(8, "0");
+    const hex = row.join(" ").padEnd(rowSize * 3 - 1, " ");
+    const ascii = row
+      .map((byte) => {
+        const code = parseInt(byte, 16);
+        return code >= 32 && code <= 126 ? String.fromCharCode(code) : ".";
+      })
+      .join("");
+    return { offset, hex, ascii };
+  });
+}
+
+function ProtoWireViewer({
+  frames,
+  selectedIndex,
+  onSelectFrame
+}: {
+  frames: ProtoFrame[];
+  selectedIndex: number;
+  onSelectFrame: (index: number) => void;
+}) {
+  const selectedFrame = frames[selectedIndex];
+  const hexRows = selectedFrame ? formatHexDumpRows(selectedFrame.proto) : [];
+
+  return (
+    <Card className="json-card proto-card" size="small" title="Protobuf wire bytes">
+      {selectedFrame ? (
         <>
+          <div className="proto-toolbar">
+            {frames.length > 1 ? (
+              <Select
+                size="small"
+                value={selectedIndex}
+                onChange={onSelectFrame}
+                options={frames.map((frame, index) => ({
+                  value: index,
+                  label: `${frame.label} - ${frame.jsonPath}`
+                }))}
+                className="proto-frame-select"
+              />
+            ) : (
+              <Text strong>{selectedFrame.label}</Text>
+            )}
+            <Text className="proto-path">{selectedFrame.jsonPath}</Text>
+          </div>
+
           <div className="proto-meta">
             <Text type="secondary">Type</Text>
-            <Text strong>{proto.type}</Text>
+            <Text strong>{selectedFrame.proto.type}</Text>
             <Text type="secondary">Bytes</Text>
-            <Text strong>{proto.serializedBytes}</Text>
+            <Text strong>{selectedFrame.proto.serializedBytes}</Text>
+            <Text type="secondary">JSON value</Text>
+            <Text strong>
+              {selectedFrame.product ? `${selectedFrame.product}${selectedFrame.mid ? ` mid=${formatPrice(selectedFrame.mid)}` : ""}` : "n/a"}
+            </Text>
           </div>
-          <pre className="json-viewer proto-viewer">
-            <Text>{proto.text}</Text>
+
+          <div className="proto-hex-viewer" aria-label="Protobuf wire byte hex dump">
+            <div className="proto-hex-header">
+              <span>Offset</span>
+              <span>Hex bytes</span>
+              <span>ASCII preview</span>
+            </div>
+            {hexRows.map((row) => (
+              <div className="proto-hex-row" key={row.offset}>
+                <span className="proto-offset">{row.offset}</span>
+                <span className="proto-bytes">{row.hex}</span>
+                <span className="proto-ascii">{row.ascii}</span>
+              </div>
+            ))}
+          </div>
+
+          <Text type="secondary" className="proto-section-label">
+            Decoded Text Format view
+          </Text>
+          <pre className="json-viewer proto-decoded-viewer">
+            <Text>{selectedFrame.proto.text}</Text>
           </pre>
+          <Text type="secondary" className="proto-section-label">
+            Base64 of the same wire bytes
+          </Text>
           <pre className="proto-base64">
-            <Text>{proto.serializedBase64}</Text>
+            <Text>{selectedFrame.proto.serializedBase64}</Text>
           </pre>
         </>
       ) : (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Call a valid product to inspect the raw protobuf response" />
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Call a valid product to inspect protobuf wire bytes" />
       )}
     </Card>
   );
@@ -267,10 +426,13 @@ export default function Pricing() {
   const [priceHistory, setPriceHistory] = useState<Record<string, Price[]>>({});
   const [lastCall, setLastCall] = useState<ApiCallResult<unknown> | null>(null);
   const [lastPayload, setLastPayload] = useState<unknown>(null);
+  const [selectedProtoFrame, setSelectedProtoFrame] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const currentHistory = priceHistory[product] || [];
   const price = latestPriceByProduct[product] || null;
+  const protoFrames = useMemo(() => collectProtoFrames(lastCall?.raw), [lastCall?.raw]);
+  const safeProtoFrame = protoFrames.length ? Math.min(selectedProtoFrame, protoFrames.length - 1) : 0;
 
   async function getLatestPrice(selectedProduct = product) {
     setLoading(true);
@@ -304,6 +466,10 @@ export default function Pricing() {
     setStream(null);
     void getLatestPrice(product);
   }, [product]);
+
+  useEffect(() => {
+    setSelectedProtoFrame(0);
+  }, [lastCall?.raw]);
 
   return (
     <div className="page-stack">
@@ -380,7 +546,7 @@ export default function Pricing() {
 
       <div className="evidence-grid">
         <JsonViewer title="BFF request" value={lastPayload} />
-        <ProtoMessageViewer proto={price?.proto} />
+        <ProtoWireViewer frames={protoFrames} selectedIndex={safeProtoFrame} onSelectFrame={setSelectedProtoFrame} />
         <JsonViewer title="gRPC response as JSON" value={lastCall?.raw} />
       </div>
     </div>

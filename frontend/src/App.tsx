@@ -5,9 +5,11 @@ import {
   DeploymentUnitOutlined,
   DollarOutlined,
   ExperimentOutlined,
-  FileSearchOutlined
+  FileSearchOutlined,
+  LogoutOutlined,
+  UserOutlined
 } from "@ant-design/icons";
-import { ConfigProvider, Layout, Menu, Typography, theme } from "antd";
+import { Button, ConfigProvider, Layout, Menu, Typography, theme } from "antd";
 import { useMemo, useState } from "react";
 import Dashboard from "./pages/Dashboard";
 import Orders from "./pages/Orders";
@@ -15,6 +17,7 @@ import Portfolio from "./pages/Portfolio";
 import Pricing from "./pages/Pricing";
 import TestRuns from "./pages/TestRuns";
 import Tracing from "./pages/Tracing";
+import { keycloak } from "./auth/keycloak";
 
 const { Sider, Content } = Layout;
 const { Text, Title } = Typography;
@@ -23,6 +26,8 @@ type PageKey = "dashboard" | "orders" | "portfolio" | "pricing" | "test-runs" | 
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<PageKey>("dashboard");
+  const username = keycloak.tokenParsed?.preferred_username || "Signed in";
+  const displayName = keycloak.tokenParsed?.name || username;
 
   const page = useMemo(() => {
     switch (currentPage) {
@@ -81,6 +86,22 @@ export default function App() {
               { key: "tracing", icon: <DeploymentUnitOutlined />, label: "Tracing" }
             ]}
           />
+          <div className="session-panel">
+            <div className="session-avatar" aria-hidden="true">
+              <UserOutlined />
+            </div>
+            <div className="session-copy">
+              <Text title={displayName}>{displayName}</Text>
+              <Text title={username}>{username}</Text>
+            </div>
+            <Button
+              type="text"
+              icon={<LogoutOutlined />}
+              aria-label="Sign out"
+              title="Sign out"
+              onClick={() => void keycloak.logout({ redirectUri: window.location.origin })}
+            />
+          </div>
         </Sider>
         <Layout>
           <Content className="content-shell">{page}</Content>

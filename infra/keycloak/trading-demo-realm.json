@@ -1,0 +1,57 @@
+{
+  "realm": "trading-demo",
+  "displayName": "Trading QA Demo",
+  "enabled": true,
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "roles": {
+    "realm": [
+      { "name": "qa_user", "description": "Trading QA demo user" },
+      { "name": "qa_admin", "description": "Trading QA demo administrator" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "trading-demo-frontend",
+      "name": "Trading QA Frontend",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "implicitFlowEnabled": false,
+      "redirectUris": ["http://localhost:3000/*"],
+      "webOrigins": ["http://localhost:3000"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:3000/*"
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "qa.user",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "QA",
+      "lastName": "User",
+      "email": "qa.user@example.test",
+      "credentials": [
+        { "type": "password", "value": "qa123456", "temporary": false }
+      ],
+      "realmRoles": ["qa_user"]
+    },
+    {
+      "username": "qa.admin",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "QA",
+      "lastName": "Admin",
+      "email": "qa.admin@example.test",
+      "credentials": [
+        { "type": "password", "value": "admin123456", "temporary": false }
+      ],
+      "realmRoles": ["qa_user", "qa_admin"]
+    }
+  ]
+}

@@ -1,8 +1,11 @@
-from fastapi import FastAPI
+from typing import Annotated, Any
+
+from fastapi import Depends, FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.auth import require_authenticated_user
 from app.models.common import ServiceError, error_payload, success_response
 from app.routers import dashboard, orders, portfolio, pricing, test_runs
 from app.tracing import configure_tracing, instrument_fastapi_app, instrument_grpc_client, instrument_httpx_client
@@ -49,8 +52,22 @@ def health() -> dict:
     return success_response({"status": "ok", "service": "bff"})
 
 
-app.include_router(dashboard.router, prefix="/api")
-app.include_router(orders.router, prefix="/api")
-app.include_router(portfolio.router, prefix="/api")
-app.include_router(pricing.router, prefix="/api")
-app.include_router(test_runs.router, prefix="/api")
+@app.get("/api/auth/me", tags=["auth"])
+def auth_me(claims: Annotated[dict[str, Any], Depends(require_authenticated_user)]) -> dict:
+    return success_response(
+        {
+            "userId": claims.get("sub"),
+            "username": claims.get("preferred_username"),
+            "name": claims.get("name"),
+            "email": claims.get("email"),
+            "roles": claims.get("realm_access", {}).get("roles", []),
+        }
+    )
+
+
+protected = [Depends(require_authenticated_user)]
+app.include_router(dashboard.router, prefix="/api", dependencies=protected)
+app.include_router(orders.router, prefix="/api", dependencies=protected)
+app.include_router(portfolio.router, prefix="/api", dependencies=protected)
+app.include_router(pricing.router, prefix="/api", dependencies=protected)
+app.include_router(test_runs.router, prefix="/api", dependencies=protected)
